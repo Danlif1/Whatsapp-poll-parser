@@ -32,7 +32,7 @@ def extract_poll_data(file_path):
                 time = match.group(2)
                 name = match.group(3)
                 if name == "Daniel Lifshitz":
-                    name = "דניאל טובת_סודיות"
+                    name = "דניאל סודי"
                 datetime_str = f"{date} {time}"
                 name = name.split()[0]
 
