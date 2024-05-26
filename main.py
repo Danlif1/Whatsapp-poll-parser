@@ -8,6 +8,11 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+import move_from_downloads_to_here
+import enter_whatsapp
+import time
+from dotenv import load_dotenv
+import os
 
 # parse whatsapp chat.
 def extract_poll_data(file_path):
@@ -84,7 +89,7 @@ def create_sheet(poll_data):
         for i in range(0, 30):
             cell = ws.cell(row=row_index, column=i + 1)
             cell.border = thin_border
-            cell.alignment = Alignment(horizontal='leftf', vertical='bottom', text_rotation=180)
+            cell.alignment = Alignment(horizontal='left', vertical='bottom', text_rotation=180)
         if first:
             length = len(data_list)
             for i in range(0, length):
@@ -143,10 +148,17 @@ def transfer_sheet(from_name, to_name):
 
 
 def main():
+    load_dotenv()
+    zip_name = os.getenv("zip_name")
+    enter_whatsapp.run_whatsapp_part()
+    time.sleep(5)
+    move_from_downloads_to_here.moving_file(zip_name)
     file_path = '_chat.txt'
     poll_data = extract_poll_data(file_path)
     create_sheet(poll_data)
     transfer_sheet("poll_data.xlsx", "1UkqRW1LlgwcQMlK8zV0E8mkw990QqiRNquo69F5dHUM")
+    move_from_downloads_to_here.remove_files(zip_name)
+    enter_whatsapp.exit_whatsapp_part()
 
 
 if __name__ == "__main__":

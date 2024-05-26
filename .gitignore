@@ -3,3 +3,4 @@
 *.txt
 *.xlsx
 credentials.json
+.env
