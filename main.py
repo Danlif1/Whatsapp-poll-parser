@@ -46,6 +46,14 @@ def translate_data(byte_data):
                 votes_for[_message['1']] += 1
         except:
             pass
+    try:
+        if isinstance(message['8']['6']['1'], list):
+            for _vote in message['8']['6']['1']:
+                votes_for[_vote] += 1
+        else:
+            votes_for[message['8']['6']['1']] += 1
+    except:
+        pass
     result = {"header": header, "options": options, "votes": votes_for}
     return result
 
@@ -301,7 +309,7 @@ def create_sheet(poll_data):
         if first:
             length = len(data_list)
             for i in range(0, length):
-                cell = ws.cell(row=row_index, column=i + 1, value=data_list[i])
+                cell = ws.cell(row=row_index, column=i + 1, value=str(data_list[i]))
                 cell.border = thin_border
                 cell.font = font
             first = 0
@@ -309,7 +317,8 @@ def create_sheet(poll_data):
         length = len(data_list)
         # Otherwise we do something a little different.
         for i in range(0, length - 2):
-            cell = ws.cell(row=row_index, column=i + 1, value=data_list[i])
+            cell = ws.cell(row=row_index, column=i + 1, value=str(data_list[i]))
+
             cell.border = thin_border
             cell.font = font
             if i % 2 != 0 and 5 <= i <= len(data_list):
@@ -319,8 +328,8 @@ def create_sheet(poll_data):
                 color = calculate_color(min_value, max_value, value)
                 cell.fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
         # The last two cells are for the date of the update and the person who updated.
-        ws.cell(row=row_index, column=29, value=data_list[-2]).font = font
-        ws.cell(row=row_index, column=30, value=data_list[-1]).font = font
+        ws.cell(row=row_index, column=29, value=str(data_list[-2])).font = font
+        ws.cell(row=row_index, column=30, value=str(data_list[-1])).font = font
 
     wb.save("poll_data.xlsx")
 
@@ -339,6 +348,12 @@ def calculate_color(min_value, max_value, value):
     b = int((245 - 208) * (1 - ratio)) + 208
     return f'{r:02x}{g:02x}{b:02x}'
 
+def convert_to_string(value):
+    """ Convert value to string, handling different types carefully """
+    if isinstance(value, (int, float)):
+        # Convert numeric values to strings without scientific notation
+        return format(value, 'f').rstrip('0').rstrip('.')
+    return str(value)
 
 # transfer from excel to google sheet.
 def hex_to_rgb(hex_color):
@@ -364,6 +379,8 @@ def transfer_sheet(from_name, to_name):
     df = pd.read_excel(excel_file)
     df.replace([np.inf, -np.inf], '', inplace=True)
     df.fillna('', inplace=True)
+    df = df.applymap(convert_to_string)
+
 
     # Updating the Google sheet.
     sheet = client.open_by_key(sheet_id)
