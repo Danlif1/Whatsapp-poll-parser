@@ -21,7 +21,6 @@ message_types = {"POLL": 46}
 
 load_dotenv()
 path_to_db = os.getenv('path_to_db')
-print(path_to_db)
 
 people_map = {}
 
@@ -34,10 +33,10 @@ def initalize_people():
 def translate_data(byte_data):
     message, typedef = blackboxprotobuf.decode_message(byte_data)
     header = message['8']['2'].decode('utf8')
-    questions = []
+    options = []
     for _message in message['8']['3']:
-        questions.append(_message['1'].decode('utf8'))
-    votes_for = [0] * len(questions)
+        options.append(_message['1'].decode('utf8'))
+    votes_for = [0] * len(options)
     for _message in message['8']['5']:
         try:
             if isinstance(_message['1'], list):
@@ -47,7 +46,7 @@ def translate_data(byte_data):
                 votes_for[_message['1']] += 1
         except:
             pass
-    result = {"header": header, "questions": questions, "votes": votes_for}
+    result = {"header": header, "options": options, "votes": votes_for}
     return result
 
 
@@ -135,7 +134,7 @@ class Session:
             """From messages_table take ZTEXT (Z_PK = id)"""
             self.cursor.execute(f"SELECT ZTEXT FROM {Session.messages_table} WHERE Z_PK = ?", (self.id,))
             result = self.cursor.fetchone()[0]
-            return translate_data(result) if result else None
+            return result
 
     class Poll(Message):
         def __init__(self, id, cursor):
@@ -263,8 +262,8 @@ def extract_poll_data(chat_name):
         single_poll.append(poll['time'])
         single_poll.append(poll['header'])
         actual_index = 0
-        for question in poll['questions']:
-            single_poll.append(question)
+        for option in poll['options']:
+            single_poll.append(option)
             single_poll.append(poll['votes'][actual_index])
             actual_index += 1
         today = datetime.now()
