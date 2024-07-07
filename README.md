@@ -7,7 +7,7 @@ You need to use a .env file, this is the format:
 chat_name = "The name of the chat you want to use"
 sheet_id = "In the url of the google sheets this is what comes after /d/"
 path_to_db = "This is where ChatStorage.sqlite is located (including the string ChatStorage.sqlite)"
-people_map = '{"name1 (This is the user default name on whatsapp)": "actualNameOne (This is how you want him to be called", "name2": "actualName2"}'
+people_map = '{"phoneNumber1": "name1 (This is how you want him to be called", "phoneNumber2": "name2"}'
 ```
 
 ## How to actually run
@@ -17,7 +17,7 @@ You need to use run.sh, write this into the terminal:
 ```
 If it doesn't work it means you need to give it permissions, run the following:
 ```
-chmod 777 ./run.sh
+chmod +x run.sh
 ./run.sh
 ```
 

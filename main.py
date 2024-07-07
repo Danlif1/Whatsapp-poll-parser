@@ -1,21 +1,19 @@
 import json
 from dotenv import load_dotenv
 import os
+
+from data_handling import initialize_people, path_to_db
 from extarct_polls import extract_poll_data
+from session_file import Session
 from sheets import create_sheet, transfer_sheet
 
-message_types = {"POLL": 46}
 
-load_dotenv()
-path_to_db = os.getenv('path_to_db')
-
-people_map = {}
-
-
-def initialize_people():
-    global people_map
-    # Loading the people map from the env file.
-    people_map = json.loads(os.getenv('people_map'))
+# Sorting the messages in a chat by date order.
+def sort_messages(chat_name):
+    session = Session(path_to_db)
+    # Getting the chat id.
+    my_chat = session.get_chat_id(chat_name)
+    session.sort_chat_by_date(my_chat)
 
 
 def main():
@@ -27,9 +25,9 @@ def main():
     initialize_people()
     # Extracting the polls from whatsapp database into list of lists.
     poll_data = extract_poll_data(chat_name)
-    # Creating Excel sheet.
+    # # Creating Excel sheet.
     create_sheet(poll_data)
-    # Transferring from Excel to Google.
+    # # Transferring from Excel to Google.
     transfer_sheet("poll_data.xlsx", sheet_id)
 
 

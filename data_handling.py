@@ -1,7 +1,30 @@
+import json
+import os
 import blackboxprotobuf
+from dotenv import load_dotenv
+
+message_types = {"POLL": 46}
+
+load_dotenv()
+path_to_db = os.getenv('path_to_db')
+
+people_map = {}
 
 
 # Translating poll data into a map.
+def initialize_people():
+    global people_map
+    # Loading the people map from the env file.
+    people_map = json.loads(os.getenv('people_map'))
+
+
+# Get the initialized data.
+def get_people_map():
+    if not people_map:
+        initialize_people()
+    return people_map
+
+
 def translate_data(byte_data):
     # Decoding the data.
     message, typedef = blackboxprotobuf.decode_message(byte_data)

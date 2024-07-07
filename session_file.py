@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 from hexdump import hexdump
 import hexdump
 
-from extarct_polls import translate_data
-from main import message_types
+from data_handling import translate_data, message_types
 
 
 class Session:
@@ -56,11 +55,7 @@ class Session:
                 self.cursor.execute(f"SELECT ZMEMBERJID FROM {Session.group_members_id_table} WHERE Z_PK = ?",
                                     (sender_id,))
                 member_id = self.cursor.fetchone()[0]
-                if member_id:
-                    self.cursor.execute(f"SELECT ZPUSHNAME FROM {Session.group_members_name_table} WHERE ZJID = ?",
-                                        (member_id,))
-                    member_name = self.cursor.fetchone()[0]
-                    return member_name
+                return member_id[:member_id.find('@')]
             return None
 
         # Getting the content of the message. (The text)
@@ -99,7 +94,7 @@ class Session:
     # Getting the messages ids from the chat.
     def get_messages_by_chat_id(self, chat_id) -> List[Message]:
         """
-       From messages_table take all Z_PK (ZCHATSESSION = chat_id) sort by ZMESSAGEDATE (high to low)
+       From messages_table take all Z_PK (ZCHATSESSION = chat_id) sort by ZMESSAGEDATE (low to high)
        Uses SQL query
        """
         self.cursor.execute(
@@ -151,7 +146,7 @@ class Session:
     # Getting the messages from a chat of a specific type (for example: 46 = poll)
     def get_messages_by_chat_id_and_type(self, chat_id, message_type) -> List[Message]:
         """
-       From messages_table take all Z_PK (ZCHATSESSION = chat_id, ZMESSAGETYPE = message_type) sort by ZMESSAGEDATE (high to low)
+       From messages_table take all Z_PK (ZCHATSESSION = chat_id, ZMESSAGETYPE = message_type) sort by ZMESSAGEDATE (low to high)
        Uses SQL query
        """
         self.cursor.execute(
@@ -161,3 +156,22 @@ class Session:
             return [Session.Poll(id=row[0], cursor=self.cursor) for row in self.cursor.fetchall()]
         else:
             return [Session.Message(id=row[0], cursor=self.cursor) for row in self.cursor.fetchall()]
+
+    def sort_chat_by_date(self, chat_id):
+        """
+        From messages_table take all Z_PK (ZCHATSESSION = chat_id) sort by ZMESSAGEDATE (low to high).
+        For each Z_PK set the message_table.ZSORT of it to be its index.
+        """
+        # Get all messages IDs sorted by date (low to high)
+        self.cursor.execute(
+            f"SELECT Z_PK FROM {Session.messages_table} WHERE ZCHATSESSION = ? ORDER BY ZMESSAGEDATE ASC", (chat_id,))
+        messages = self.cursor.fetchall()
+        length = len(messages)
+        # Update each message's ZSORT field with its index
+        for index, (message_id,) in enumerate(messages):
+            self.cursor.execute(
+                f"UPDATE {Session.messages_table} SET ZSORT = ? WHERE Z_PK = ?", (index, message_id))
+        self.cursor.execute(f"UPDATE {Session.chats_table} SET ZMESSAGECOUNTER = ? WHERE Z_PK = ?", (length, chat_id))
+
+        # Commit changes to the database
+        self.conn.commit()
