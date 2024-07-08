@@ -1,6 +1,6 @@
 from datetime import datetime
 import blackboxprotobuf
-from data_handling import path_to_db, get_people_map
+from data_handling import path_to_db, get_people_map, message_types
 from session_file import Session
 
 
@@ -12,7 +12,7 @@ def extract_polls(chat_name):
     # Getting the chat id.
     my_chat = session.get_chat_id(chat_name)
     # Getting the polls from the chat.
-    my_messages = session.get_messages_by_chat_id_and_type(my_chat, 46)
+    my_messages = session.get_messages_by_chat_id_and_type(my_chat, message_types["POLL"])
     for message in my_messages:
         # Getting the poll header/question, options and votes.
         poll = message.get_info(raw=False)
