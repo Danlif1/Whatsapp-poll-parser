@@ -122,7 +122,11 @@ def transfer_sheet(from_name, to_name):
     for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column)):
         for col_idx, cell in enumerate(row):
             if cell.fill.start_color.rgb is not None:
-                rgb_color = hex_to_rgb(cell.fill.start_color.rgb[2:])  # skip the first two characters 'FF'
+                rgb_color = 0
+                if isinstance(cell.fill.start_color.rgb,openpyxl.styles.colors.RGB):
+                    rgb_color = (0, 0, 0)
+                else:
+                    rgb_color = hex_to_rgb(cell.fill.start_color.rgb[2:])  # skip the first two characters 'FF'
                 if rgb_color == (0, 0, 0):
                     rgb_color = (255, 255, 255)
                 cell_format = {
