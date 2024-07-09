@@ -7,7 +7,7 @@ message_types = {"POLL": 46}
 
 load_dotenv()
 path_to_db = os.getenv('path_to_db')
-
+runner = os.getenv("runner")
 people_map = {}
 
 

@@ -25,9 +25,9 @@ def main():
     initialize_people()
     # Extracting the polls from whatsapp database into list of lists.
     poll_data = extract_poll_data(chat_name)
-    # # Creating Excel sheet.
+    # Creating Excel sheet.
     create_sheet(poll_data)
-    # # Transferring from Excel to Google.
+    # Transferring from Excel to Google.
     transfer_sheet("poll_data.xlsx", sheet_id)
 
 

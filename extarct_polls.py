@@ -1,6 +1,6 @@
 from datetime import datetime
 import blackboxprotobuf
-from data_handling import path_to_db, get_people_map, message_types
+from data_handling import path_to_db, get_people_map, message_types, runner
 from session_file import Session
 
 
@@ -20,7 +20,7 @@ def extract_polls(chat_name):
         poll['creator'] = message.get_sender()
         if poll['creator'] is None:
             # If there is no creator it is me.
-            poll['creator'] = 'דניאל'
+            poll['creator'] = runner
         # Adding the time of the poll.
         poll['time'] = message.get_time()
         # Adding the poll to the polls list.
@@ -65,7 +65,7 @@ def extract_poll_data(chat_name):
         today = today.strftime("%d.%m.%y %H:%M")
         single_poll.append(today)
         # Adding the updater. (Me)
-        single_poll.append("דניאל")
+        single_poll.append(runner)
         # Adding the poll to the poll list.
         all_polls.append(single_poll)
     return all_polls

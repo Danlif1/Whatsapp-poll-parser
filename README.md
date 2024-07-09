@@ -8,6 +8,7 @@ chat_name = "The name of the chat you want to use"
 sheet_id = "In the url of the google sheets this is what comes after /d/"
 path_to_db = "This is where ChatStorage.sqlite is located (including the string ChatStorage.sqlite)"
 people_map = '{"phoneNumber1": "name1 (This is how you want him to be called", "phoneNumber2": "name2"}'
+runner = "Your name"
 ```
 
 ## How to actually run
