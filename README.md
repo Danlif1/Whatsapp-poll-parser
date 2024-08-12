@@ -1,4 +1,4 @@
-# Whatsapp_poll_parser
+# Whatsapp poll parser
 Transferring polls from Whatsapp to google sheets
 
 ## How to select chat, google sheets path, sqlite database path, and actual people names.
