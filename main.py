@@ -22,6 +22,7 @@ def main():
     chat_name = os.getenv("chat_name")
     sheet_id = os.getenv("sheet_id")
     # Initializing people map.
+    # sort_messages(chat_name)
     initialize_people()
     # Extracting the polls from whatsapp database into list of lists.
     poll_data = extract_poll_data(chat_name)

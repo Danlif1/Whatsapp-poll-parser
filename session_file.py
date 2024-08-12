@@ -1,4 +1,5 @@
 import sqlite3
+import time
 from typing import List
 from datetime import datetime, timedelta
 from hexdump import hexdump
@@ -77,7 +78,7 @@ class Session:
             result = self.cursor.fetchone()[0]
             if raw:
                 # The hexdump of the data.
-                return hexdump(result)
+                return result
             # The data in a readable format. (A map of the header, options and votes of the poll)
             return translate_data(result) if result else None
 
@@ -111,8 +112,26 @@ class Session:
                             (chat_id,))
         return [row[0] for row in self.cursor.fetchall()]
 
+    def update_chat_session(self, chat_id):
+        self.cursor.execute(
+            f"SELECT Z_OPT, ZMESSAGECOUNTER, ZLASTMESSAGE FROM {Session.chats_table} WHERE ZCHATSESSION = ?",
+            (chat_id,))
+        (previous_Z_OPT, previous_ZMESSAGECOUNTER, previous_ZLASTMESSAGE) = self.cursor.fetchall()
+
+        current_unix_time = time.time()
+        epoch_start = datetime(2001, 1, 1)
+        epoch_start_unix = int((epoch_start - datetime(1970, 1, 1)).total_seconds())
+        adjusted_time_unix = current_unix_time - epoch_start_unix
+        adjusted_time_unix += 7200
+        current_date = datetime(1970, 1, 1) + timedelta(seconds=adjusted_time_unix)
+
+        self.cursor.execute(
+            f"UPDATE {Session.chats_table} PUT Z_OPT = ?, ZMESSAGECOUNTER = ?, ZLASTMESSAGE = ?, ZLASTMESSAGEDATE "
+            f"= ? WHERE Z_PK = ?",
+            (previous_Z_OPT + 1, previous_ZMESSAGECOUNTER + 1, previous_ZLASTMESSAGE + 1, current_date, chat_id))
+
     # Currently not in use.
-    def mention_everyone(self, chat_id, message_id):
+    def mention_everyone(self, chat_id):
         """
        Call get_members_by_chat_id(chat_id)
        Create a string called mention_string for each element in the list we get do the following:
@@ -127,21 +146,8 @@ class Session:
 
         # Create mention string
         mention_string = ''.join(f'B{member}\n' for member in members)
+        self.update_chat_session(chat_id)
 
-        # Get the last message id
-        messages = self.get_messages_by_chat_id(chat_id)
-        last_message_id = messages[-1].id if messages else None
-
-        if last_message_id:
-            # Update the last message to mention everyone
-            self.cursor.execute(f"UPDATE {Session.messages_table} SET ZTEXT = ? WHERE Z_PK = ?",
-                                ('@everyone', last_message_id))
-
-            # Update the metadata for the media item
-            self.cursor.execute(f"UPDATE {Session.messages_media_table} SET ZMETADATA = ? WHERE ZMESSAGE = ?",
-                                (mention_string, last_message_id))
-
-            self.conn.commit()
 
     # Getting the messages from a chat of a specific type (for example: 46 = poll)
     def get_messages_by_chat_id_and_type(self, chat_id, message_type) -> List[Message]:

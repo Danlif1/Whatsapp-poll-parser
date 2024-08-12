@@ -16,12 +16,19 @@ def extract_polls(chat_name):
     for message in my_messages:
         # Getting the poll header/question, options and votes.
         poll = message.get_info(raw=False)
+        # Sanitize user input.
+        if poll['header'][0] == "=":
+            poll['header'] = "'" + poll['header']
+        for index, option in enumerate(poll['options']):
+            if option[0] == "=":
+                poll['options'][index] = "'" + option
+        # print(message.get_info(raw=True), poll)
         # Adding the creator.
         poll['creator'] = message.get_sender()
         if poll['creator'] is None:
             # If there is no creator it is me.
             poll['creator'] = runner
-        # Adding the time of the poll.
+            # Adding the time of the poll.
         poll['time'] = message.get_time()
         # Adding the poll to the polls list.
         polls.append(poll)
