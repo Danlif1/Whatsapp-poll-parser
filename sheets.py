@@ -123,7 +123,7 @@ def transfer_sheet(from_name, to_name):
         for col_idx, cell in enumerate(row):
             if cell.fill.start_color.rgb is not None:
                 rgb_color = 0
-                if isinstance(cell.fill.start_color.rgb,openpyxl.styles.colors.RGB):
+                if isinstance(cell.fill.start_color.rgb, openpyxl.styles.colors.RGB):
                     rgb_color = (0, 0, 0)
                 else:
                     rgb_color = hex_to_rgb(cell.fill.start_color.rgb[2:])  # skip the first two characters 'FF'
