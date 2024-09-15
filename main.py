@@ -4,16 +4,19 @@ import os
 
 from data_handling import initialize_people, path_to_db
 from extarct_polls import extract_poll_data
+from extract_data import extract_messages_count
 from session_file import Session
 from sheets import create_sheet, transfer_sheet
 
 
 # Sorting the messages in a chat by date order.
-def sort_messages(chat_name):
+def sort_messages(chat_id=None, chat_name=None):
     session = Session(path_to_db)
     # Getting the chat id.
-    my_chat = session.get_chat_id(chat_name)
-    session.sort_chat_by_date(my_chat)
+
+    if not chat_id:
+        chat_id = session.get_chat_id(chat_name)
+    session.sort_chat_by_date(chat_id)
 
 
 def main():
@@ -24,8 +27,13 @@ def main():
     # Initializing people map.
     # sort_messages(chat_name)
     initialize_people()
+    # sort_messages(chat_name=chat_name)
+    # for i in range(0,1000):
+    #     sort_messages(chat_id=i)
     # Extracting the polls from whatsapp database into list of lists.
     poll_data = extract_poll_data(chat_name)
+    message_data = extract_messages_count(chat_name)
+
     # Creating Excel sheet.
     create_sheet(poll_data)
     # Transferring from Excel to Google.
