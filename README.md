@@ -1,26 +1,38 @@
 # Whatsapp poll parser
-Transferring polls from Whatsapp to google sheets
+Transferring polls from WhatsApp to Google Sheets
 
-## How to select chat, google sheets path, sqlite database path, and actual people names.
+## How to select chat, Google Sheets path, SQLite database path, and actual people names.
 You need to use a .env file, this is the format:
 ```
 chat_name = "The name of the chat you want to use"
-sheet_id = "In the url of the google sheets this is what comes after /d/"
+sheet_id = "In the URL of the google sheets this is what comes after /d/"
 path_to_db = "This is where ChatStorage.sqlite is located (including the string ChatStorage.sqlite)"
-people_map = '{"phoneNumber1": "name1 (This is how you want him to be called", "phoneNumber2": "name2"}'
+people_map = '{"phoneNumber1": "name1 (This is how you want him to be called)", "phoneNumber2": "name2"}'
 runner = "Your name"
 ```
-
-## How to actually run
+(path_to_db on Mac (The target usage) is:<br/>
+/Users/[User]/Library/Group Containers/group.net.whatsapp.WhatsApp.shared/ChatStorage.sqlite)
+## How to run
 You need to use run.sh, write this into the terminal:
 ```
 ./run.sh
 ```
-If it doesn't work it means you need to give it permissions, run the following:
+If it doesn't work it means you need to permit it, run the following:
 ```
 chmod +x run.sh
 ./run.sh
 ```
+
+## Common errors
+### Can't transfer the polls from Excel to Google Sheets
+Create a Google Cloud services account (Look up [https://console.cloud.google.com](https://console.cloud.google.com))
+
+Connect it to your Google Sheet with an editor status
+
+Copy and paste the credentials.json file into the folder where you run the code.
+
+Rerun
+
 
 ## What the code do?
 
