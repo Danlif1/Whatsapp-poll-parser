@@ -6,12 +6,10 @@ You need to use a .env file, this is the format:
 ```
 chat_name = "The name of the chat you want to use"
 sheet_id = "In the URL of the google sheets this is what comes after /d/"
-path_to_db = "This is where ChatStorage.sqlite is located (including the string ChatStorage.sqlite)"
+path_to_db = "/Users/$USER/Library/Group\ Containers/group.net.whatsapp.WhatsApp.shared/ChatStorage.sqlite"
 people_map = '{"phoneNumber1": "name1 (This is how you want him to be called)", "phoneNumber2": "name2"}'
 runner = "Your name"
 ```
-(path_to_db on Mac (The target usage) is:<br/>
-/Users/[User]/Library/Group Containers/group.net.whatsapp.WhatsApp.shared/ChatStorage.sqlite)
 ## How to run
 You need to use run.sh, write this into the terminal:
 ```
